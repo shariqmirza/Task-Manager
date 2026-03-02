@@ -23,7 +23,8 @@ async login(@Body() body, @Res({ passthrough: true }) res) {
 
   res.cookie('token', result.access_token, {
     httpOnly: true,
-    sameSite: 'lax',
+    secure: true,
+    sameSite: 'none',
   });
 
   return result;
