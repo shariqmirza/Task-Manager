@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:4000",
+  baseURL: "https://task-manager-backend-6bsx.onrender.com",
   withCredentials: true,
 });
 
