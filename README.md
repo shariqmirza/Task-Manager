@@ -1,64 +1,50 @@
-# Task Manager App
+# 🚀 Task Manager (Full Stack)
 
-A full-stack Task Management system with Kanban workflow, authentication, and Task manager project.
+A modern full-stack Task Management application built with:
 
-Built using **Next.js, NestJS, MongoDB**, and **TailwindCSS**.
-
----
-
-## Features
-
-### Authentication
-
-* User registration & login
-* JWT authentication with secure cookies
-* Protected routes & middleware
-* Logout functionality
-
-### Projects
-
-* Create projects 
-* Edit & delete projects
-* Project dashboard view
-
-### Tasks & Kanban Board
-
-* Create, edit & delete tasks
-* Drag & drop between columns
-* Status workflow:
-
-  * TODO
-  * IN PROGRESS
-  * DONE
-* Empty state & loading states
-
-### UI & UX
-
-* Modern responsive design (TailwindCSS)
-* Modal-based forms (no browser alerts)
-* Clean professional interface
+- **Frontend:** Next.js 16 (App Router) + TailwindCSS + React Query  
+- **Backend:** NestJS + MongoDB + JWT Authentication  
+- **Drag & Drop:** dnd-kit  
+- **Deployment:** Vercel (Frontend) + Render (Backend)
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-### Frontend
+### 🔐 Authentication
+- User Registration
+- Login with JWT
+- Secure logout
+- Protected routes
+- Session handling with token
 
-* Next.js (App Router)
-* React Query
-* TailwindCSS (Styling)
-* dnd-kit (drag & drop)
+### 📁 Projects
+- Create project
+- Edit project name
+- Delete project
+- Each project belongs to authenticated user only
 
-### Backend
+### 📋 Tasks (Kanban Board)
+- Create task
+- Edit task
+- Delete task
+- Drag & Drop between:
+  - TODO
+  - IN PROGRESS
+  - DONE
+- Real-time UI update with React Query
 
-* NestJS
-* MongoDB (Mongoose)
-* JWT Authentication
-* REST API
+### 🎨 UI
+- Clean modern Tailwind design
+- Responsive layout
+- Loading states
+- Empty states
+- Modal-based editing (no browser alerts)
 
 ---
 
-## Project Structure
+## 🏗️ Project Structure
+
 
 ```
 Task Manager/
@@ -124,35 +110,46 @@ http://localhost:3000
 
 ---
 
-## Authentication Flow
-
-* New users register an account
-* Login stores JWT in secure cookie
-* Protected routes require authentication
-* Middleware redirects unauthorized users
 
 ---
 
-## Usage
+# 🔒 Security Notes
 
-1. Register a new account
-2. Login to dashboard
-3. Create a project
-4. Open project board
-5. Add tasks & drag between columns
-
----
-
-## Future Improvements
-
-* Real-time collaboration
-* Dark mode
-* Notifications
-* Role-based access
-* Activity history
+- JWT authentication
+- Protected API routes using NestJS Guards
+- User-specific data isolation
+- Token cleared on logout
+- Route-level protection on frontend
 
 ---
 
-## Author
+# 🧠 Technical Decisions
 
-Built as a full-stack assignment project.
+- Used React Query for API state management
+- Used dnd-kit for drag-and-drop (lightweight & modern)
+- Used modal components instead of browser alerts
+- Clean separation of concerns (Modules in NestJS)
+- Production-ready folder structure
+
+---
+
+# 🚀 Future Improvements
+
+- Role-based access
+- Activity logs
+- Task due dates
+- Filtering & search
+- Optimistic UI updates
+- Unit & integration tests
+
+---
+
+# 👨‍💻 Author
+
+Built as a full-stack assignment project demonstrating:
+
+- API architecture
+- Authentication flow
+- State management
+- Modern UI design
+- Production deployment
