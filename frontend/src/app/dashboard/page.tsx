@@ -33,6 +33,7 @@ export default function Dashboard() {
   <button
     onClick={async () => {
       await api.post("/auth/logout");
+      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       window.location.href = "/login";
     }}
     className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"

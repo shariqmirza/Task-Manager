@@ -18,16 +18,8 @@ logout(@Res({ passthrough: true }) res: express.Response) {
 }
 
   @Post('login')
-async login(@Body() body, @Res({ passthrough: true }) res) {
-  const result = await this.authService.login(body.email, body.password);
-
-  res.cookie('token', result.access_token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-  });
-
-  return result;
+async login(@Body() body) {
+  return this.authService.login(body.email, body.password);
 }
 
   @Get('me')
