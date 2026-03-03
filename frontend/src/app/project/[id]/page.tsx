@@ -1,12 +1,13 @@
 "use client";
+
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /* ---------- Draggable Task ---------- */
-function DraggbleTask({ task, openEdit, openDelete }: any) {
+function DraggableTask({ task, openEdit, openDelete }: any) {
   const { attributes, listeners, setNodeRef, transform } =
     useDraggable({ id: task._id });
 
@@ -49,7 +50,7 @@ function DraggbleTask({ task, openEdit, openDelete }: any) {
   );
 }
 
-/* ------ Column ------ */
+/* ---------- Column ---------- */
 function Column({ status, tasks, openEdit, openDelete }: any) {
   const { setNodeRef } = useDroppable({ id: status });
 
@@ -73,7 +74,7 @@ function Column({ status, tasks, openEdit, openDelete }: any) {
       )}
 
       {tasks.map((task: any) => (
-        <DraggbleTask
+        <DraggableTask
           key={task._id}
           task={task}
           openEdit={openEdit}
@@ -87,9 +88,23 @@ function Column({ status, tasks, openEdit, openDelete }: any) {
 export default function Board() {
   const { id } = useParams();
 
+  // ✅ AUTH CHECK
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+    } else {
+      setChecked(true);
+    }
+  }, []);
+
   const { data: tasks = [], refetch, isLoading, isError } = useQuery({
-    queryKey: ["tasks"],
+    queryKey: ["tasks", id],
     queryFn: () => api.get(`/tasks/${id}`).then((r) => r.data),
+    enabled: checked,
   });
 
   const columns = ["todo", "inprogress", "done"];
@@ -123,18 +138,29 @@ export default function Board() {
     refetch();
   };
 
+  if (!checked) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Checking authentication...
+      </div>
+    );
+  }
+
   if (isLoading)
     return <div className="p-6 text-center text-gray-500">Loading...</div>;
+
   if (isError)
     return <div className="p-6 text-center text-red-500">Failed to load</div>;
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl text-center font-semibold mb-6">Task Board</h1>
+      <h1 className="text-2xl text-center font-semibold mb-6">
+        Task Board
+      </h1>
 
       <button
         onClick={openCreate}
-        className="bg-black text-white cursor-pointer px-3 py-2 mb-4"
+        className="bg-black text-white cursor-pointer px-3 py-2 mb-4 rounded"
       >
         + Add Task
       </button>
@@ -153,7 +179,7 @@ export default function Board() {
         </div>
       </DndContext>
 
-      {/*   EDIT  */}
+      {/* CREATE / EDIT */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
@@ -203,7 +229,7 @@ export default function Board() {
         </div>
       )}
 
-      {/* DELETE  */}
+      {/* DELETE */}
       {deletingTask && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg text-center">
