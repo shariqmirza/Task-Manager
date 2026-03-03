@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { data, refetch } = useQuery({
@@ -32,8 +33,9 @@ export default function Dashboard() {
       <div className="flex justify-end mb-4">
   <button
     onClick={async () => {
+      const queryClient = useQueryClient();
       await api.post("/auth/logout");
-      document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      queryClient.clear();
       window.location.href = "/login";
     }}
     className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
