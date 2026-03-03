@@ -3,7 +3,15 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
+import {
+  DndContext,
+  useDroppable,
+  useDraggable,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 
 /* ---------- Draggable Task ---------- */
@@ -13,7 +21,7 @@ function DraggableTask({ task, openEdit, openDelete }: any) {
 
   const style = {
     transform: transform
-      ? `translate(${transform.x}px, ${transform.y}px)`
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
   };
 
@@ -21,9 +29,9 @@ function DraggableTask({ task, openEdit, openDelete }: any) {
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white p-3 mb-2 rounded-lg border border-gray-200 hover:shadow-md transition flex justify-between items-center"
+      className="bg-white p-3 mb-2 rounded-lg border border-gray-200 hover:shadow-md transition flex justify-between items-center touch-none"
     >
-      <span {...listeners} {...attributes} className="flex-1 cursor-grab">
+      <span {...listeners} {...attributes} className="flex-1 cursor-grab active:cursor-grabbing">
         {task.title}
       </span>
 
@@ -88,7 +96,18 @@ function Column({ status, tasks, openEdit, openDelete }: any) {
 export default function Board() {
   const { id } = useParams();
 
-  // ✅ AUTH CHECK
+  /* ---------- Sensors (Desktop + Mobile) ---------- */
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    })
+  );
+
+  /* ---------- Auth Check ---------- */
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
@@ -165,7 +184,7 @@ export default function Board() {
         + Add Task
       </button>
 
-      <DndContext onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {columns.map((col) => (
             <Column
@@ -179,7 +198,7 @@ export default function Board() {
         </div>
       </DndContext>
 
-      {/* CREATE / EDIT */}
+      {/* CREATE / EDIT MODAL */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
@@ -229,7 +248,7 @@ export default function Board() {
         </div>
       )}
 
-      {/* DELETE */}
+      {/* DELETE MODAL */}
       {deletingTask && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg text-center">
