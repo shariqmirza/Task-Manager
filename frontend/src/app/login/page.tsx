@@ -8,10 +8,12 @@ export default function Login() {
   const [password,setPassword]=useState("");
   const router=useRouter();
 
-  const login = async () => {
-    const res = await api.post("/auth/login",{ email,password });
-    
-    router.push("/dashboard");
+  const login =  async () => {
+  const res = await api.post("/auth/login", { email, password });
+
+  localStorage.setItem("token", res.data.access_token);
+
+  router.push("/dashboard");
   };
 
   return (

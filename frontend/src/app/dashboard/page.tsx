@@ -2,14 +2,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+
 
 export default function Dashboard() {
   const { data, refetch } = useQuery({
     queryKey: ["projects"],
     queryFn: () => api.get("/projects").then((r) => r.data),
   });
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "/login";
+  }
+}, []);
 
   const [showModal, setShowModal] = useState(false);
   const [projectName, setProjectName] = useState("");
@@ -36,8 +43,9 @@ export default function Dashboard() {
   <button
   onClick={async () => {
     await api.post("/auth/logout");
-    queryClient.clear();
-    window.location.href = "/login";
+localStorage.removeItem("token");
+queryClient.clear();
+window.location.href = "/login";
   }}
   className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
 >

@@ -12,23 +12,13 @@ export class AuthController {
     return this.authService.register(body.email, body.password);
   }
   @Post('logout')
-logout(@Res({ passthrough: true }) res: express.Response) {
-  res.clearCookie('token');
+logout() {
   return { message: 'Logged out' };
 }
 
- @Post('login')
-async login(@Body() body, @Res({ passthrough: true }) res) {
-  const result = await this.authService.login(body.email, body.password);
-
-  res.cookie('token', result.access_token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    
-  });
-
-  return { message: "Login success" };
+@Post('login')
+async login(@Body() body) {
+  return this.authService.login(body.email, body.password);
 }
 
   @Get('me')
