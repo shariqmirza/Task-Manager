@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [projectName, setProjectName] = useState("");
   const [editingProject, setEditingProject] = useState<any>(null);
   const [deletingProject, setDeletingProject] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const openCreate = () => {
     setEditingProject(null);
@@ -27,21 +28,21 @@ export default function Dashboard() {
     setProjectName(project.name);
     setShowModal(true);
   };
+  
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="flex justify-end mb-4">
   <button
-    onClick={async () => {
-      const queryClient = useQueryClient();
-      await api.post("/auth/logout");
-      queryClient.clear();
-      window.location.href = "/login";
-    }}
-    className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
-  >
-    Logout
-  </button>
+  onClick={async () => {
+    await api.post("/auth/logout");
+    queryClient.clear();
+    window.location.href = "/login";
+  }}
+  className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
+>
+  Logout
+</button>
 </div>
       <h1 className="text-2xl text-center font-semibold mb-6">
         Your Projects
