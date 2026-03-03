@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import {
   DndContext,
@@ -14,7 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 
-/* ---------- Draggable Task ---------- */
+/*  Drag Task */
 function DraggableTask({ task, openEdit, openDelete }: any) {
   const { attributes, listeners, setNodeRef, transform } =
     useDraggable({ id: task._id });
@@ -58,7 +58,7 @@ function DraggableTask({ task, openEdit, openDelete }: any) {
   );
 }
 
-/* ---------- Column ---------- */
+/*  Column - Todo, In Progress, Done  */
 function Column({ status, tasks, openEdit, openDelete }: any) {
   const { setNodeRef } = useDroppable({ id: status });
 
@@ -95,8 +95,9 @@ function Column({ status, tasks, openEdit, openDelete }: any) {
 
 export default function Board() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
 
-  /* ---------- Sensors (Desktop + Mobile) ---------- */
+  /* Mobile SEnsor */
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(TouchSensor, {
@@ -107,7 +108,7 @@ export default function Board() {
     })
   );
 
-  /* ---------- Auth Check ---------- */
+  
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
@@ -150,12 +151,25 @@ export default function Board() {
   };
 
   const handleDragEnd = async (event: any) => {
-    const { active, over } = event;
-    if (!over) return;
+  const { active, over } = event;
+  if (!over) return;
 
-    await api.patch(`/tasks/${active.id}`, { status: over.id });
-    refetch();
-  };
+  const taskId = active.id;
+  const newStatus = over.id;
+
+   
+  queryClient.setQueryData(["tasks", id], (oldData: any) =>
+    oldData?.map((task: any) =>
+      task._id === taskId ? { ...task, status: newStatus } : task
+    )
+  );
+
+  try {
+    await api.patch(`/tasks/${taskId}`, { status: newStatus });
+  } catch (error) {
+    refetch(); //  if failed
+  }
+};
 
   if (!checked) {
     return (
@@ -198,7 +212,7 @@ export default function Board() {
         </div>
       </DndContext>
 
-      {/* CREATE / EDIT MODAL */}
+      {/* CREATE / EDIT  */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
@@ -248,7 +262,7 @@ export default function Board() {
         </div>
       )}
 
-      {/* DELETE MODAL */}
+      {/* DELETE  */}
       {deletingTask && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg text-center">
