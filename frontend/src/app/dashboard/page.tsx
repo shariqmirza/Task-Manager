@@ -1,13 +1,19 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-
 
 export default function Dashboard() {
-  const [authorized, setAuthorized] = useState<boolean | null>(null);
+ 
+  const [checked, setChecked] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [editingProject, setEditingProject] = useState<any>(null);
+  const [deletingProject, setDeletingProject] = useState<any>(null);
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -15,29 +21,24 @@ export default function Dashboard() {
     if (!token) {
       window.location.href = "/login";
     } else {
-      setAuthorized(true);
+      setChecked(true);
     }
   }, []);
 
-  if (authorized === null) {
-    return null; // 
-  }
-  const { data, refetch } = useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: () => api.get("/projects").then((r) => r.data),
+    enabled: checked,
   });
-  useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    window.location.href = "/login";
-  }
-}, []);
 
-  const [showModal, setShowModal] = useState(false);
-  const [projectName, setProjectName] = useState("");
-  const [editingProject, setEditingProject] = useState<any>(null);
-  const [deletingProject, setDeletingProject] = useState<any>(null);
-  const queryClient = useQueryClient();
+  
+  if (!checked) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        Checking authentication...
+      </div>
+    );
+  }
 
   const openCreate = () => {
     setEditingProject(null);
@@ -50,27 +51,29 @@ export default function Dashboard() {
     setProjectName(project.name);
     setShowModal(true);
   };
-  
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      {/* LOGOUT */}
       <div className="flex justify-end mb-4">
-  <button
-  onClick={async () => {
-    await api.post("/auth/logout");
-localStorage.removeItem("token");
-queryClient.clear();
-window.location.href = "/login";
-  }}
-  className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
->
-  Logout
-</button>
-</div>
+        <button
+          onClick={async () => {
+            await api.post("/auth/logout");
+            localStorage.removeItem("token");
+            queryClient.clear();
+            window.location.href = "/login";
+          }}
+          className="text-sm bg-red-500 hover:bg-red-600 cursor-pointer text-white px-3 py-1 rounded"
+        >
+          Logout
+        </button>
+      </div>
+
       <h1 className="text-2xl text-center font-semibold mb-6">
         Your Projects
       </h1>
 
+      {/* NEW PROJECT */}
       <button
         onClick={openCreate}
         className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white px-4 py-2 rounded-lg mb-4"
@@ -78,6 +81,12 @@ window.location.href = "/login";
         + New Project
       </button>
 
+      {/* LOADING STATE */}
+      {isLoading && (
+        <div className="text-center text-gray-500">Loading projects...</div>
+      )}
+
+      {/* PROJECT LIST */}
       {data?.map((p: any) => (
         <div
           key={p._id}
@@ -105,7 +114,7 @@ window.location.href = "/login";
         </div>
       ))}
 
-      {/* CREATE / EDIT */}
+      {/*  EDIT  */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-80 shadow-lg">
