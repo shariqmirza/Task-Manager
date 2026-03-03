@@ -25,7 +25,7 @@ async login(@Body() body, @Res({ passthrough: true }) res) {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    path: '/',
+    
   });
 
   return { message: "Login success" };
