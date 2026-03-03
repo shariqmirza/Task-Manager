@@ -7,6 +7,21 @@ import { useQueryClient } from "@tanstack/react-query";
 
 
 export default function Dashboard() {
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "/login";
+    } else {
+      setAuthorized(true);
+    }
+  }, []);
+
+  if (authorized === null) {
+    return null; // 
+  }
   const { data, refetch } = useQuery({
     queryKey: ["projects"],
     queryFn: () => api.get("/projects").then((r) => r.data),
