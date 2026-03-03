@@ -13,6 +13,10 @@ async function bootstrap() {
     ],
   credentials: true,
   });
+  app.use((req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
   app.use(cookieParser());
   await app.listen(process.env.PORT ?? 4000);
 }
