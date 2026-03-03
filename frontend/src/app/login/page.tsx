@@ -10,7 +10,7 @@ export default function Login() {
 
   const login = async () => {
     const res = await api.post("/auth/login",{ email,password });
-    document.cookie = `token=${res.data.access_token}; path=/; Secure; SameSite=Lax`;
+    
     router.push("/dashboard");
   };
 

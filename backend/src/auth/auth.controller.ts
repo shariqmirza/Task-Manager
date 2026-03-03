@@ -17,9 +17,18 @@ logout(@Res({ passthrough: true }) res: express.Response) {
   return { message: 'Logged out' };
 }
 
-  @Post('login')
-async login(@Body() body) {
-  return this.authService.login(body.email, body.password);
+ @Post('login')
+async login(@Body() body, @Res({ passthrough: true }) res) {
+  const result = await this.authService.login(body.email, body.password);
+
+  res.cookie('token', result.access_token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    path: '/',
+  });
+
+  return { message: "Login success" };
 }
 
   @Get('me')
